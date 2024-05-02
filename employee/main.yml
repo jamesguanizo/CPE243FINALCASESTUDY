@@ -1,0 +1,80 @@
+- name: Installation of prometheus
+  apt:
+    name:
+      - prometheus
+    state: latest
+  when: ansible_distribution == "Ubuntu"
+
+- name: Add Elasticsearch APT repository key
+  shell: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+  when: ansible_distribution == "Ubuntu"
+
+- name: Add Elasticsearch APT repository
+  apt_repository:
+    repo: deb https://artifacts.elastic.co/packages/7.x/apt stable main
+    state: present
+  when: ansible_distribution == "Ubuntu"
+
+- name: Update APT cache
+  apt:
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+
+- name: Install Elasticsearch
+  apt:
+    name: elasticsearch
+    state: present
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Start Elasticsearch service
+  
+- name: Install Kibana
+  apt:
+    name: kibana
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Start and enable Kibana service
+
+- name: Install Logstash
+  apt:
+    name: logstash
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Start and enable Logstash service
+
+- name: Start Elastic service
+  shell: service elasticsearch start
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+
+- name: Enable Elastic service
+  shell: systemctl enable elasticsearch
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt" 
+
+- name: Start Kibana service
+  shell: service kibana start
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+
+- name: Enable Kibana service
+  shell: systemctl enable kibana
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+
+
+- name: Start Logstash service
+  shell: /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/*.conf &
+  async: 0
+  poll: 0
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+
+- name: Enable Logstash service
+  shell: systemctl enable logstash
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
