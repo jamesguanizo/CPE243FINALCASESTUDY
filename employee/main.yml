@@ -64,7 +64,7 @@
   become: true
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt" 
 
-- name: Start Kibana service
+- name: Start and enable Kibana service
   shell: service kibana start
   become: true
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
@@ -75,7 +75,7 @@
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
 
 
-- name: Start Logstash service
+- name: Start and enable Logstash service
   shell: /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/*.conf &
   async: 0
   poll: 0
