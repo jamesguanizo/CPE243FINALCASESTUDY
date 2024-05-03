@@ -54,12 +54,12 @@
   notify:
     - Start and enable Logstash service
 
-- name: Start Elastic service
+- name: Start Elasticsearch service
   shell: service elasticsearch start
   become: true
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
 
-- name: Enable Elastic service
+- name: Enable Elasticsearch service
   shell: systemctl enable elasticsearch
   become: true
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt" 
