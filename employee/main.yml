@@ -86,3 +86,24 @@
   shell: systemctl enable logstash
   become: true
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+
+- name: Install Fail2Ban for SSH protection
+  apt:
+    name: fail2ban
+    state: latest
+    update_cache: yes
+  when: ansible_distribution == "Ubuntu"
+  notify:
+    - Start fail2ban service
+    
+- name: Start fail2ban service 
+  shell: service fail2ban start
+  become: true
+  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
+  
+- name: Install rsyslog
+  apt:
+    name: rsyslog
+    state: latest
+    update_cache: yes
+ when: ansible_distribution == "Ubuntu"
