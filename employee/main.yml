@@ -39,7 +39,7 @@
   notify:
     - Start and enable Logstash service
 
-handlers:
+
   - name: Start Elasticsearch service
     shell: service elasticsearch start
     become: true
