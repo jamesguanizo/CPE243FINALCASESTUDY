@@ -1,9 +1,3 @@
-    - name: Configure fail2ban
-      copy:
-        src: /etc/fail2ban/jail.local
-        dest: /etc/fail2ban/fail2ban.conf
-      notify: Restart fail2ban
-
     - name: Configure AIDE
       copy:
         src: /etc/aide/aide.conf
@@ -15,20 +9,10 @@
         src: /etc/logwatch/conf/logwatch.conf
         dest: /etc/logwatch/conf/logwatch.conf
 
-  handlers:
-    - name: Restart UFW
-      service:
-        name: ufw
-        state: restarted
-        
-    - name: Restart fail2ban
-      service:
-        name: fail2ban
-        state: restarted
-
     - name: Initialize AIDE database
       command: aideinit
       changed_when: false
+
 ## CONFIGURING CRYPTOGRAPHY AND ENCRYPTION (CA WITH SSL)
 - name: install openssl
   yum:
