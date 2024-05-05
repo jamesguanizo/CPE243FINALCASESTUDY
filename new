@@ -15,7 +15,7 @@
 
 ## CONFIGURING CRYPTOGRAPHY AND ENCRYPTION (CA WITH SSL)
 - name: install openssl
-  yum:
+  apt:
     name: openssl
     state: present
 
