@@ -1,10 +1,10 @@
 ---
 - hosts: all
   vars:
-   ansible_ssh_private_key_file: ~/.ssh/id_ed25519 
+    ansible_python_interpreter: /usr/bin/python3 
+    ansible_ssh_private_key_file: ~/.ssh/id_ed25519 
   become: true
   pre_tasks:
-  
     - name: Update apt package cache
       apt:
         update_cache: yes
@@ -14,6 +14,7 @@
         upgrade: dist
         autoremove: yes
         autoclean: yes
+
     - name: Install UFW
       apt:
         name: ufw
@@ -46,13 +47,105 @@
         group: root
         mode: 0644
       notify: Restart unattended-upgrades
+    - name: Create AIDE directory if it doesn't exist
+      file:
+        path: /etc/aide
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
 
-  handlers:
-    - name: Restart unattended-upgrades
-      systemd:
-        name: unattended-upgrades
-        state: restarted
-      become: yes
+    - name: Configure AIDE
+      copy:
+        content: |
+          # AIDE configuration
+          /bin      NORMAL
+          /sbin     NORMAL
+          /lib      NORMAL
+          # Add more rules as needed
+        dest: /etc/aide/aide.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Initialize AIDE Database
+    
+    - name: Install AIDE package
+      apt:
+        name: aide
+    - name: Create Logwatch directory if it doesn't exist
+      file:
+        path: /etc/logwatch/conf
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+    
+    - name: Configure Logwatch
+      copy:
+        content: |
+          # Logwatch configuration
+          # Default log level is Low
+          LogLevel: Low
+
+          # Specify the detail level of the report
+          Detail: High
+
+          # Specify the mail address to send reports
+          MailTo: admin@example.com
+
+          # Specify the detail level of the report for individual services
+          MailDetail: High
+
+          # Add custom log paths for Logwatch to monitor
+          LogFile: /var/log/custom.log
+
+          # Add more configurations as needed
+        dest: /etc/logwatch/conf/logwatch.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: install openssl
+      apt:
+        name: openssl
+        state: present
+
+    - name: Install cryptography library
+      apt:
+        name: python3-cryptography  # or python-cryptography for Python 2
+        state: present
+
+    - name: generate CA key
+      openssl_privatekey:
+        path: /etc/ssl/private/ca.key
+        size: 4096
+      register: ca_ssl_key
+
+    - name: generate CA certificate
+      openssl_csr:
+        path: /etc/ssl/certs/ca.csr
+        privatekey_path: /etc/ssl/private/ca.key
+        common_name: "CA WITH SSL FOR USERS"
+        country_name: "PH"
+        state_or_province_name: "Manila"
+        locality_name: "Anonas"
+        organization_name: "IT Organization"
+        email_address: "qrjdguanizo@tip.edu.ph"
+        use_common_name_for_san: false
+      register: ca_csr
+
+    - name: self signed CA certificate
+      openssl_certificate:
+        path: /etc/ssl/certs/ca.crt
+        privatekey_path: /etc/ssl/private/ca.key
+        csr_path: /etc/ssl/certs/ca.csr
+        provider: selfsigned
+        force: true
+
+    - name: copy the cert to the remote users
+      copy:
+        src: /etc/ssl/certs/ca-certificates.crt
+        dest: /etc/pki/ca-trust/source/anchors/
 
 - hosts: Supervisor
   become: true
@@ -63,3 +156,4 @@
   become: true
   roles:
     - Employee
+
