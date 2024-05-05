@@ -29,12 +29,12 @@
   openssl_csr:
     path: /etc/ssl/certs/ca.csr
     privatekey_path: /etc/ssl/private/ca.key
-    common_name: "CA WITH SSL FOR CENTOS"
+    common_name: "CA WITH SSL FOR USERS"
     country_name: "PH"
     state_or_province_name: "Manila"
     locality_name: "Anonas"
     organization_name: "IT Organization"
-    email_address: "qtsgenon@tip.edu.ph"
+    email_address: "qrjdguanizo@tip.edu.ph"
     use_common_name_for_san: false
   register: ca_csr
 
