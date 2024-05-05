@@ -64,19 +64,6 @@
   shell: systemctl enable kibana
   become: true
   when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
-
-
-- name: Start and enable Logstash service
-  shell: /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/*.conf &
-  async: 0
-  poll: 0
-  become: true
-  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
-
-- name: Enable Logstash service
-  shell: systemctl enable logstash
-  become: true
-  when: ansible_distribution == "Ubuntu" and ansible_pkg_mgr == "apt"
   
 - name: Install rsyslog
   apt:
