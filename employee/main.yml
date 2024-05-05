@@ -45,15 +45,6 @@
   notify:
     - Start and enable Kibana service
 
-- name: Install Logstash
-  apt:
-    name: logstash
-    state: latest
-    update_cache: yes
-  when: ansible_distribution == "Ubuntu"
-  notify:
-    - Start and enable Logstash service
-
 - name: Start Elasticsearch service
   shell: service elasticsearch start
   become: true
